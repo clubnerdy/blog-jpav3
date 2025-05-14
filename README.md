@@ -66,6 +66,8 @@
 
 - CORS (Cross Origin Resource Sharing) -> 모든 서버는 JS요청을 거부한다.
 - 통합 테스트 (DS-C-S-R-PC-DB)
+- 빌드 해보기
+- 로그 설정하기 (v1 - api sentry, v2, v3)
 - API 문서 만들기
 
 ## 기술스택
