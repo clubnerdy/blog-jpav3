@@ -40,30 +40,31 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+// 1. gradlew build or 서버실행 (test코드 실행 -> 결과 build/generted-snippets에 copy한다. *.adoc) - 변수설정
 ext {
-    snippetsDir = file('build/generated-snippets')
+    set('snippetsDir', file("build/generated-snippets"))
 }
 
-test {
-    useJUnitPlatform()
+// 2. gradlew build (test코드 실행 -> 진짜로 1번의 결과가 실행됨)
+tasks.named('test') {
     outputs.dir snippetsDir
-    systemProperty 'file.encoding', 'UTF-8'
+    useJUnitPlatform()
 }
 
-asciidoctor {
+// 3. 테스트가 종료되면 asciidoctor 실행 -> *.adoc 파일들을 가지고 하나의 . adoc 파일로 변경 (src/docs/asciidoc)
+tasks.named('asciidoctor') {
     inputs.dir snippetsDir
     dependsOn test
-    outputDir = file("${buildDir}/docs/asciidoc")
 }
 
-task copyDocs(type: Copy) {
-    dependsOn asciidoctor
-    from("${asciidoctor.outputDir}")
-    into("src/main/resources/static/docs")
-}
-
+// 4. HTML 파일을 서버에서 열어볼 수 있게 copy
 bootJar {
-    dependsOn copyDocs
+    dependsOn asciidoctor
+    copy {
+        // src/docs/asciidoc == from 경로
+        from "${asciidoctor.outputDir}"
+        into 'src/main/resources/static/docs'    // /static/docs로 복사!
+    }
 }
 
 // plain 파일 생성하지 않기
